@@ -20,6 +20,7 @@ PG_PORT = os.getenv("POSTGRESQL_PORT")
 PG_DB = os.getenv("POSTGRESQL_DBNAME")
 OWNER_IDS = os.getenv("OWNERS_IDS").split(",")
 BASE_WEB_URL = os.getenv("BASE_WEB_URL")
+WEB_APP_URL = os.getenv("WEB_APP_URL")
 
 
 async def get_pool() -> asyncpg.Pool:

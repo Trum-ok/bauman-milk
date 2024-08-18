@@ -33,8 +33,8 @@ async def main():
     dp['db'] = db
 
     await bot.set_my_commands([
-        BotCommand(command="start", description="Начало приключения"),
-        BotCommand(command="help", description="Где я")
+        BotCommand(command="start", description="Начало приключения 🚀"),
+        BotCommand(command="help", description="Где я 🗺️")
     ])
 
     # start_http_server(PROMETHEUS_PORT)
