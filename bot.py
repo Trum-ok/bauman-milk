@@ -31,6 +31,7 @@ async def main():
     pool = await get_pool()
     db = Database(pool)
     dp['db'] = db
+    await db.create()
 
     await bot.set_my_commands([
         BotCommand(command="start", description="Начало приключения 🚀"),

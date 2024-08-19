@@ -1,0 +1,6 @@
+version: '3'
+services:
+  app:
+    image: b_coin_bot
+    env_file:
+      - .env

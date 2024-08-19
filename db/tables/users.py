@@ -29,12 +29,11 @@ class UsersTable:
                      tg_id: int, 
                     ) -> None:
         """Insert a new account"""
-        await self.pool.execute(
-            """
-            INSERT INTO users ($1)
-            """,
-            tg_id
-        )
+
+        query = f"""
+            INSERT INTO users (tg_id) VALUES ({tg_id})
+        """
+        await self.pool.execute(query)
 
 
     async def update(self, 

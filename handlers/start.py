@@ -1,3 +1,5 @@
+import asyncpg
+
 from aiogram import Router, types, F
 from aiogram.filters import Command, CommandStart, CommandObject
 
@@ -6,6 +8,7 @@ from aiogram.filters import Command, CommandStart, CommandObject
 # from db.main import Database
 from utils.text import START
 from utils.keyboards import start_kb
+from db.main import Database
 # from utils.exceptions import UserNotFound
 
 router = Router()
@@ -27,10 +30,19 @@ async def start_(message: types.Message, command: CommandObject):
 
 
 @router.message(Command('start'))
-async def start(message: types.Message):
+async def start(message: types.Message,  db: Database):
     # добавить фото
-    await message.answer(
-        text=START.format(name=message.from_user.username), 
+    # await message.answer(
+    #     text=START.format(name=message.from_user.username), 
+    #     reply_markup=start_kb.as_markup()
+    # )
+    try:
+        await db.users.insert(message.from_user.id)
+    except asyncpg.exceptions.UniqueViolationError:
+        pass
+    await message.answer_photo(
+        photo=types.FSInputFile(path="props/not.jpg"),
+        caption=START.format(name=message.from_user.username),
         reply_markup=start_kb.as_markup()
     )
 
