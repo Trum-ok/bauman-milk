@@ -1,6 +1,7 @@
-version: '3'
+version: '3.7'
+
 services:
   app:
-    image: b_coin_bot
+    image: my-telegram-bot
     env_file:
-      - .env
+      - telegram/.env

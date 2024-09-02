@@ -13,7 +13,7 @@ class SquadsTable:
         await self.pool.execute(
             """
             CREATE TABLE IF NOT EXISTS squads (
-                squad_id INT SERIAL PRIMARY KEY,
+                squad_id SERIAL PRIMARY KEY,
                 name VARCHAR(16) NOT NULL,
                 users INT[] NOT NULL,
                 avatar_url TEXT

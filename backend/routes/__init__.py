@@ -1,1 +1,0 @@
-from .coins import router as coins_router

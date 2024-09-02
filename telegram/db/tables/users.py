@@ -1,89 +1,82 @@
-from asyncpg import Pool
+from cassandra.cluster import Session
+from cassandra.query import SimpleStatement
 from typing import Union
 
 
 class User:
     def __init__(self, **kwargs):
-        self.tg_id: int = kwargs.get('tg_id')
+        self.user_id: int = kwargs.get('user_id')
         self.status: str = kwargs.get('status', 'active')
 
 
 class UsersTable:
     """Users Table"""
 
-    def __init__(self, pool: Pool) -> None:
-        self.pool = pool
+    def __init__(self, session: Session) -> None:
+        self.session = session
     
-    async def create(self) -> None:
+    def create(self) -> None:
         """Create the table"""
-        await self.pool.execute(
-            """
+        query = \
+        """
             CREATE TABLE IF NOT EXISTS users (
-                tg_id INT PRIMARY KEY,
-                status TEXT DEFAULT 'active'
-            )
-            """)
-
+                user_id BIGINT PRIMARY KEY,
+                balance INT,
+                energy SMALLINT,
+                squad BOOLEAN
+            );
+        """
+        self.session.execute(query)
    
-    async def insert(self, 
-                     tg_id: int, 
-                    ) -> None:
-        """Insert a new account"""
+    def insert(self, user_id: int) -> None:
+        """Insert a new user only if the user doesn't already exist"""
 
-        query = f"""
-            INSERT INTO users (tg_id) VALUES ({tg_id})
+        query = \
         """
-        await self.pool.execute(query)
+            INSERT INTO users (user_id, balance, energy, squad)
+            VALUES (%s, %s, %s, %s)
+            IF NOT EXISTS
+        """
+        self.session.execute(query, (user_id, 0, 1000, False))
 
-
-    async def update(self, 
-                     tg_id: int,
-                     status: str = None,
-                    ) -> None:
-        """Обновление статуса по telegram ID"""
+    def update(self, user_id: int, status: str = None) -> None:
+        """Update status by telegram ID"""
         
-        query = f"""
+        query = \
+        """
             UPDATE users
-            SET status={status}
-            WHERE tg_id={tg_id}
+            SET status=%s
+            WHERE user_id=%s
         """
-        await self.pool.execute(query)
+        self.session.execute(query, (status, user_id))
 
-
-    async def delete(self, 
-                     tg_id: int, 
-                    ) -> None:
-        query = f"""
-            DELETE FROM users
-            WHERE tg_id={tg_id}
-        """
-
-        await self.pool.execute(query)
-
-    
-    async def get(self,
-                tg_id: int,
-                ) -> Union[User, None]:
-        """Получить аккаунт по telegram ID"""
-
-        query = f"""
-            SELECT *
-            FROM users
-            WHERE tg_id={tg_id}
-            """
-
-        record = await self.pool.fetchrow(query)
+    def delete(self, user_id: int) -> None:
+        """Delete user by telegram ID"""
         
+        query = \
+        """
+            DELETE FROM users
+            WHERE user_id=%s
+        """
+        self.session.execute(query, (user_id,))
+
+    def get(self, user_id: int) -> Union[User, None]:
+        """Get a user by telegram ID"""
+
+        query = \
+        """
+            SELECT * FROM users
+            WHERE user_id=%s
+        """
+        result = self.session.execute(query, (user_id,))
+        record = result.one()
+
         if not record:
             return None
 
         user = User(
-            id=record["id"],
-            email=record["email"],
-            password=record["password"],
-            tg=record["tg"],
-            chats=record["chats"],
-            status=record["status"]
+            user_id=record.user_id,
+            status=record.status
         )
 
         return user
