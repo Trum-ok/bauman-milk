@@ -29,7 +29,10 @@ async def start(message: types.Message,  db: Database):
 
 async def start_foo(message: types.Message,  db: Database):
     try:
-        db.users.insert(message.from_user.id)
+        id = message.from_user.id
+        db.users.insert(id)
+        db.energy.first(id, 1200)
+        db.upgrades.insert(id)
     except AlreadyExists:
         pass
     await message.answer_photo(

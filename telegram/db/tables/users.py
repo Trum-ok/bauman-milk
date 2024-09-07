@@ -33,11 +33,11 @@ class UsersTable:
 
         query = \
         """
-            INSERT INTO users (user_id, balance, energy, squad)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO users (user_id, balance, squad)
+            VALUES (%s, %s, %s)
             IF NOT EXISTS
         """
-        self.session.execute(query, (user_id, 0, 1000, False))
+        self.session.execute(query, (user_id, 0, False))
 
     def update(self, user_id: int, status: str = None) -> None:
         """Update status by telegram ID"""
